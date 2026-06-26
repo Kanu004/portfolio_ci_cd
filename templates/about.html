@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ portfolio.name }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>About Me</h1>
+</section>
+
+<section class="about-content">
+    <p>{{ portfolio.bio }}</p>
+    <p>
+        I focus on writing maintainable Python code and shipping features through
+        automated pipelines. Every change runs through tests and lint checks before
+        deployment — the same workflow demonstrated in this project's GitHub Actions
+        configuration.
+    </p>
+
+    <h2>Contact</h2>
+    <ul class="contact-list">
+        <li><strong>Email:</strong> <a href="mailto:{{ portfolio.email }}">{{ portfolio.email }}</a></li>
+        <li><strong>GitHub:</strong> <a href="{{ portfolio.github }}" target="_blank" rel="noopener">{{ portfolio.github }}</a></li>
+        <li><strong>LinkedIn:</strong> <a href="{{ portfolio.linkedin }}" target="_blank" rel="noopener">{{ portfolio.linkedin }}</a></li>
+    </ul>
+</section>
+{% endblock %}

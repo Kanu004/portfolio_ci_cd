@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ portfolio.name }}{% endblock %} | Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('main.index') }}" class="logo">{{ portfolio.name }}</a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('main.index') }}" {% if request.endpoint == 'main.index' %}class="active"{% endif %}>Home</a></li>
+            <li><a href="{{ url_for('main.about') }}" {% if request.endpoint == 'main.about' %}class="active"{% endif %}>About</a></li>
+            <li><a href="{{ url_for('main.projects') }}" {% if request.endpoint == 'main.projects' %}class="active"{% endif %}>Projects</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 {{ portfolio.name }}. Built with Flask &amp; CI/CD.</p>
+        <div class="social-links">
+            <a href="{{ portfolio.github }}" target="_blank" rel="noopener">GitHub</a>
+            <a href="{{ portfolio.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="mailto:{{ portfolio.email }}">Email</a>
+        </div>
+    </footer>
+</body>
+</html>

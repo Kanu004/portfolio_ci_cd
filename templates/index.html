@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Home - {{ portfolio.name }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <p class="greeting">Hello, I'm</p>
+    <h1>{{ portfolio.name }}</h1>
+    <p class="subtitle">{{ portfolio.title }}</p>
+    <p class="bio">{{ portfolio.bio }}</p>
+    <div class="cta-group">
+        <a href="{{ url_for('main.projects') }}" class="btn btn-primary">View Projects</a>
+        <a href="{{ url_for('main.about') }}" class="btn btn-secondary">About Me</a>
+    </div>
+</section>
+
+<section class="skills-section">
+    <h2>Skills</h2>
+    <ul class="skill-tags">
+        {% for skill in portfolio.skills %}
+        <li>{{ skill }}</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

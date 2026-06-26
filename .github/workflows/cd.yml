@@ -1,0 +1,74 @@
+# CD Pipeline — Continuous Deployment
+# Runs after CI succeeds. Deploys the app to Render (live URL).
+
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main, master]
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    environment:
+      name: production
+      url: ${{ steps.deploy-info.outputs.url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install production dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run smoke test before deploy
+        run: |
+          python -c "
+          from app import create_app
+          app = create_app()
+          client = app.test_client()
+          r = client.get('/health')
+          assert r.status_code == 200, 'Health check failed'
+          print('Smoke test passed')
+          "
+
+      - name: Deploy to Render
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "::error::Missing secret RENDER_DEPLOY_HOOK_URL — add it in GitHub repo Settings → Secrets."
+            exit 1
+          fi
+          curl -fsS -X POST "$DEPLOY_HOOK"
+          echo "Render deploy triggered."
+
+      - name: Deploy info
+        id: deploy-info
+        run: |
+          URL="${{ secrets.RENDER_SERVICE_URL }}"
+          if [ -z "$URL" ]; then
+            echo "::warning::Set RENDER_SERVICE_URL secret to show your live site URL here."
+            URL="https://github.com/${{ github.repository }}"
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Live URL: $URL"
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Commit:** \`${{ github.event.workflow_run.head_sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Live URL:** ${{ steps.deploy-info.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Platform:** Render" >> "$GITHUB_STEP_SUMMARY"

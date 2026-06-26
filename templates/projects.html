@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Projects - {{ portfolio.name }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Projects</h1>
+    <p class="page-subtitle">Selected work and demos</p>
+</section>
+
+<section class="projects-grid">
+    {% for project in portfolio.projects %}
+    <article class="project-card">
+        <h2>{{ project.name }}</h2>
+        <p>{{ project.description }}</p>
+        <ul class="tech-tags">
+            {% for tech in project.tech %}
+            <li>{{ tech }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ project.url }}" class="project-link">View Project &rarr;</a>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}
